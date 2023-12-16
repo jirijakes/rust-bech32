@@ -267,6 +267,18 @@ impl<'s> CheckedHrpstring<'s> {
         ByteIter { iter: AsciiToFe32Iter { iter: self.data.iter().copied() }.fes_to_bytes() }
     }
 
+    /// Returns an iterator with field elements of the data part of the parsed bech322 encoded string.
+    pub fn fe32_iter(&self) -> Fe32Iter {
+        Fe32Iter { iter: AsciiToFe32Iter { iter: self.data.iter().copied() } }
+    }
+
+    /// Returns witness version (first field element), if it is available, and rest of
+    /// the field elements.
+    pub fn fe32_iter_with_witness_version(&self) -> Option<(Fe32, Fe32Iter)> {
+        let mut iter = self.fe32_iter();
+        iter.next().map(|v| (v, iter))
+    }
+
     /// Converts this type to a [`SegwitHrpstring`] after validating the witness and HRP.
     #[inline]
     pub fn validate_segwit(mut self) -> Result<SegwitHrpstring<'s>, SegwitHrpstringError> {
